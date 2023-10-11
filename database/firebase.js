@@ -1,5 +1,6 @@
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, query, where, getDoc } =  require('firebase/firestore/lite')
+const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc } = require('firebase/firestore')
+const { v4: uuidv4 } = require('uuid');
 
 const firebaseConfig = {
     apiKey: "AIzaSyDqT4k-JYWf_USPqIZkblHN5GL67HmR_rU",
@@ -24,9 +25,38 @@ async function getUserCredentials(userName) {
     if (userlist.length > 0) {
         return userlist[0];
     }
+
+}
+
+async function addTeam(data) {
+    try {
+        const id = uuidv4()
+        const teams = doc(db, "match_results", id);
+        await setDoc(teams, data);
+    } catch (err) {
+        throw err
+    }
+}
+
+async function getAllTournaments() {
+    try {
+        const tournaments = collection(db, 'tournaments');
+        const allTournaments = await getDocs(tournaments);
+        const list = allTournaments.docs.map(doc => doc.data());
+        if (list.length > 0) {
+            return list
+        }
+        return [];
+    } catch (err) {
+        throw err;
+    }
     
+
 }
 
 module.exports = {
-    getUserCredentials
+    getUserCredentials,
+    addTeam,
+    getAllTournaments
+
 }
