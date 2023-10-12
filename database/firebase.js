@@ -32,6 +32,7 @@ async function addMatchResults(data) {
     try {
         const id = uuidv4()
         const teams = doc(db, "match_results", id);
+        data.id = id
         await setDoc(teams, data);
     } catch (err) {
         throw err
@@ -80,10 +81,27 @@ async function getAllTeamsByTournament(tournamentId) {
     }
 }
 
+async function getMatchesByTournament(tournamentId) {
+    try {
+        const users = collection(db, 'match_results');
+        const q = query(users, where("tournamentId", "==", tournamentId));
+        const tournamentVal = await getDocs(q);
+        const tournamentList = tournamentVal.docs.map(doc => doc.data());
+        console.log(tournamentList);
+        if (tournamentList.length > 0) {
+            return tournamentList;
+        }
+        return []
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     getUserCredentials,
     addMatchResults,
     getAllTournaments,
     addTeam,
-    getAllTeamsByTournament
+    getAllTeamsByTournament,
+    getMatchesByTournament
 }
