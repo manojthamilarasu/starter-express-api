@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc } = require('firebase/firestore')
+const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc, refEqual } = require('firebase/firestore')
 const { v4: uuidv4 } = require('uuid');
 
 const firebaseConfig = {
@@ -28,7 +28,7 @@ async function getUserCredentials(userName) {
 
 }
 
-async function addTeam(data) {
+async function addMatchResults(data) {
     try {
         const id = uuidv4()
         const teams = doc(db, "match_results", id);
@@ -50,13 +50,39 @@ async function getAllTournaments() {
     } catch (err) {
         throw err;
     }
-    
+}
 
+async function addTeam(data) {
+    try {
+        const id = uuidv4()
+        const teams = doc(db, "teams", id);
+        await setDoc(teams, data);
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getAllTeamsByTournament(tournamentId) {
+    try {
+        const users = collection(db, 'teams');
+        const q = query(users, where("tournamentId", "==", tournamentId));
+        const teamVal = await getDocs(q);
+        const teamList = teamVal.docs.map(doc => doc.data());
+        console.log(teamList);
+        if (teamList.length > 0) {
+            return teamList;
+        }
+        return []
+        
+    } catch (error) {
+        throw error
+    }
 }
 
 module.exports = {
     getUserCredentials,
+    addMatchResults,
+    getAllTournaments,
     addTeam,
-    getAllTournaments
-
+    getAllTeamsByTournament
 }

@@ -1,23 +1,39 @@
 const express = require('express');
 const router = express.Router();
 
-const { saveTeam } = require('../models/teams')
+const { saveMatchResults, addTeamToDB, getTeamsByTournaments } = require('../models/teams')
 
 
 
 router.post('/add-match-result', async (req, res) => {
     try {
-        // get username and password from request
-        // get the username data from firebase and match the password
-        // password encryption can be done later
         let data = req.body;
-        let response = await saveTeam(data);
-        return res.status(200).send({ sucess:true, data: response });
-        // get from firebase for this username;
+        let response = await saveMatchResults(data);
+        return res.status(200).send({ success:true, data: response });
     } catch (error) {
         res.status(500).send({ error });
     }
 
+});
+
+router.post('/add-teams', async (req, res) => {
+    try {
+        let data = req.body;
+        let response = await addTeamToDB(data);
+        return res.status(200).send({ success: true, data: response });
+    } catch (error) {
+        res.status(500).send({ error });
+    }
+});
+
+router.post('/get-teams', async (req, res) => {
+    try {
+        let data = req.body;
+        let response = await getTeamsByTournaments(data);
+        return res.status(200).send({ success: true, data: response });
+    } catch (error) {
+        res.status(500).send({ error });
+    }
 });
 
 
