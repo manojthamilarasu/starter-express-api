@@ -56,6 +56,7 @@ async function addTeam(data) {
     try {
         const id = uuidv4()
         const teams = doc(db, "teams", id);
+        data.id = id;
         await setDoc(teams, data);
     } catch (error) {
         throw error;

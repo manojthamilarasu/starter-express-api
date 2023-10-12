@@ -9,7 +9,7 @@ async function addTeamToDB(data) {
     const tournamentId = data.tournamentId;
     const teams = data.teams;
     for (let team of teams){
-        await addTeam({tournamentId, name: team });
+        await addTeam({ tournamentId, name: team });
     }
     return { created: true }
 }

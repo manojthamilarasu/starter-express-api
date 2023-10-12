@@ -10,10 +10,13 @@
   "author": "Manoj T",
   "license": "ISC",
   "dependencies": {
+    "@react-navigation/material-top-tabs": "^6.6.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase": "^10.4.0",
+    "react-native-pager-view": "^6.2.1",
+    "react-native-tab-view": "^3.5.2",
     "uuid": "^9.0.1"
   }
 }
