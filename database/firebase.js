@@ -1,5 +1,5 @@
 const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc, refEqual } = require('firebase/firestore')
+const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc, deleteDoc } = require('firebase/firestore')
 const { v4: uuidv4 } = require('uuid');
 
 const firebaseConfig = {
@@ -97,11 +97,27 @@ async function getMatchesByTournament(tournamentId) {
     }
 }
 
+async function deleteMatchInTournament(tournamentId, matchId) {
+    try {
+        const teams = collection(db, 'match_results');
+        const q = query(teams, where("tournamentId", "==", tournamentId), where('id', "==", matchId));
+        const teamVal = await getDocs(q);
+        teamVal.forEach((doc) => {
+            const docRef = doc.ref;
+            deleteDoc(docRef)
+        })
+        return;
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     getUserCredentials,
     addMatchResults,
     getAllTournaments,
     addTeam,
     getAllTeamsByTournament,
-    getMatchesByTournament
+    getMatchesByTournament,
+    deleteMatchInTournament
 }
