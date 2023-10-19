@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getTournaments, getTournamentMatches, deleteMatch, leaderBoardCalculation } = require('../models/tournaments')
+const { getTournaments, getTournamentMatches, deleteMatch, leaderBoardCalculation, addTournament } = require('../models/tournaments')
 
 
 
@@ -50,6 +50,20 @@ router.post('/leaderboard', async (req, res) => {
         res.status(500).send({ error });
     }
 })
+
+router.post('/add-tournament', async (req, res) => {
+    try {
+        let body = req.body;
+        const response = await addTournament(body.tournamentName)
+        console.log("add tournament ", response)
+        return res.status(200).send({ success: true, data: response });
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ error });
+    }
+})
+
+
 
 
 

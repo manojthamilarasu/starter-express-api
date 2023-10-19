@@ -1,9 +1,14 @@
-let { getAllTournaments, getMatchesByTournament, deleteMatchInTournament } = require('../database/firebase')
+let { getAllTournaments, getMatchesByTournament, deleteMatchInTournament, addTournamentInDB } = require('../database/firebase')
 const _ = require('lodash');
 
 async function getTournaments() {
     const res = await getAllTournaments()
     return res
+}
+
+async function addTournament(tournamentName) {
+    const res = await addTournamentInDB(tournamentName)
+    return { created: true }
 }
 
 async function getTournamentMatches(tournamentId) {
@@ -148,5 +153,6 @@ module.exports = {
     getTournaments,
     getTournamentMatches,
     deleteMatch,
-    leaderBoardCalculation
+    leaderBoardCalculation,
+    addTournament
 }

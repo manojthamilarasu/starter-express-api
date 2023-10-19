@@ -39,6 +39,16 @@ async function addMatchResults(data) {
     }
 }
 
+async function addTournamentInDB(tournamentName) {
+    try {
+        const id = uuidv4()
+        const tournament = doc(db, "tournaments", id);
+        await setDoc(tournament, {name:tournamentName , id});
+    } catch (error) {
+        throw error;
+    }
+}
+
 async function getAllTournaments() {
     try {
         const tournaments = collection(db, 'tournaments');
@@ -119,5 +129,6 @@ module.exports = {
     addTeam,
     getAllTeamsByTournament,
     getMatchesByTournament,
-    deleteMatchInTournament
+    deleteMatchInTournament,
+    addTournamentInDB
 }
