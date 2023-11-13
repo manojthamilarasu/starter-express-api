@@ -1,4 +1,4 @@
-let { addMatchResults, addTeam, getAllTeamsByTournament } = require('../database/firebase')
+let { addMatchResults, addTeam, getAllTeamsByTournament, getAllAgeGroups } = require('../database/firebase')
 
 async function saveMatchResults(data) {
     await addMatchResults(data)
@@ -19,8 +19,14 @@ async function getTeamsByTournaments(data) {
     return res;
 }
 
+async function getAgeGroups() {
+    const res = await getAllAgeGroups();
+    return res;
+}
+
 module.exports = {
     saveMatchResults,
     addTeamToDB,
-    getTeamsByTournaments
+    getTeamsByTournaments,
+    getAgeGroups
 }

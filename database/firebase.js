@@ -74,6 +74,22 @@ async function addTeam(data) {
     }
 }
 
+async function getAllAgeGroups() {
+    try {
+        const ageGroups = collection(db, 'agegroups');
+        const allAgeGroups = await getDocs(ageGroups);
+        console.log("get all age groups")
+        const list = allAgeGroups.docs.map(doc => doc.data());
+        if (list.length > 0) {
+            console.log("get all age groups result", list)
+            return list
+        }
+        return [];
+    } catch (err) {
+        throw err;
+    }
+}
+
 async function getAllTeamsByTournament(tournamentId) {
     try {
         const users = collection(db, 'teams');
@@ -129,5 +145,6 @@ module.exports = {
     getAllTeamsByTournament,
     getMatchesByTournament,
     deleteMatchInTournament,
-    addTournamentInDB
+    addTournamentInDB,
+    getAllAgeGroups
 }

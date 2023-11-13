@@ -55,6 +55,9 @@ function setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, 
     !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`, 0) : undefined  // setting default 0 value
     !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`, 0) : undefined  // setting default 0 value
 
+    !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) : undefined  // setting default 0 value
+    !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) : undefined  // setting default 0 value
+
     !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`, winnerName) : undefined
     !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.name`, loserName) : undefined;
 

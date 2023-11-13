@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { saveMatchResults, addTeamToDB, getTeamsByTournaments } = require('../models/teams')
+const { saveMatchResults, addTeamToDB, getTeamsByTournaments, getAgeGroups } = require('../models/teams')
 
 
 
@@ -30,6 +30,15 @@ router.post('/get-teams', async (req, res) => {
     try {
         let data = req.body;
         let response = await getTeamsByTournaments(data);
+        return res.status(200).send({ success: true, data: response });
+    } catch (error) {
+        res.status(500).send({ error });
+    }
+});
+
+router.get('/get-age-groups', async (req, res) => {
+    try {
+        const response = await getAgeGroups();
         return res.status(200).send({ success: true, data: response });
     } catch (error) {
         res.status(500).send({ error });
