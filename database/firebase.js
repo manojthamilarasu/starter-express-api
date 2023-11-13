@@ -97,7 +97,6 @@ async function getMatchesByTournament(tournamentId) {
         const q = query(users, where("tournamentId", "==", tournamentId));
         const tournamentVal = await getDocs(q);
         const tournamentList = tournamentVal.docs.map(doc => doc.data());
-        console.log(tournamentList);
         if (tournamentList.length > 0) {
             return tournamentList;
         }

@@ -34,29 +34,29 @@ async function leaderBoardCalculation(tournamentId) {
     }
 }
 
-function setDefaultDrawValues(leaderboard, ageGroup, drawTeamOneId, drawTeamTwoId, drawTeamOneName, drawTeamTwoName) {
-    if (!_.get(leaderboard, `${ageGroup}.${drawTeamOneId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${drawTeamOneId}.drawCount`) < 0) {
-        _.set(leaderboard, `${ageGroup}.${drawTeamOneId}.winCount`, 0)
-        _.set(leaderboard, `${ageGroup}.${drawTeamOneId}.loseCount`, 0)
+function setDefaultDrawValues(leaderboard, ageGroup, drawTeamOneId, drawTeamTwoId, drawTeamOneName, drawTeamTwoName, pool) {
+    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) < 0) {
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.winCount`, 0)
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.loseCount`, 0)
     };
-    if (!_.get(leaderboard, `${ageGroup}.${drawTeamTwoId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${drawTeamTwoId}.drawCount`) < 0) {
-        _.set(leaderboard, `${ageGroup}.${drawTeamTwoId}.winCount`, 0)
-        _.set(leaderboard, `${ageGroup}.${drawTeamTwoId}.loseCount`, 0)
+    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) < 0) {
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.winCount`, 0)
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.loseCount`, 0)
     };
-    if (!_.get(leaderboard, `${ageGroup}.${drawTeamOneId}.name`)) {
-        _.set(leaderboard, `${ageGroup}.${drawTeamOneId}.name`, drawTeamOneName);
+    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.name`)) {
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.name`, drawTeamOneName);
     }
-    if (!_.get(leaderboard, `${ageGroup}.${drawTeamTwoId}.name`)) {
-        _.set(leaderboard, `${ageGroup}.${drawTeamTwoId}.name`, drawTeamTwoName);
+    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.name`)) {
+        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.name`, drawTeamTwoName);
     }
 }
 
-function setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName) {
-    !_.get(leaderboard, `${ageGroup}.${loserId}.winCount`) ? _.set(leaderboard, `${ageGroup}.${loserId}.winCount`, 0) : undefined  // setting default 0 value
-    !_.get(leaderboard, `${ageGroup}.${winnerId}.loseCount`) ? _.set(leaderboard, `${ageGroup}.${winnerId}.loseCount`, 0) : undefined  // setting default 0 value
+function setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool) {
+    !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`, 0) : undefined  // setting default 0 value
+    !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`, 0) : undefined  // setting default 0 value
 
-    !_.get(leaderboard, `${ageGroup}.${winnerId}.name`) ? _.set(leaderboard, `${ageGroup}.${winnerId}.name`, winnerName) : undefined
-    !_.get(leaderboard, `${ageGroup}.${loserId}.name`) ? _.set(leaderboard, `${ageGroup}.${loserId}.name`, loserName) : undefined;
+    !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`, winnerName) : undefined
+    !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.name`, loserName) : undefined;
 
 }
 
@@ -84,53 +84,79 @@ async function calculateLeaderBoard(tournamentId) {
     */
 
     _.forEach(matchList, (data) => {
-        console.log("calculating")
         const ageGroup = data.ageGroup;
         const isMatchDraw = data.isMatchDraw;
 
-        const drawTeamOneId = data.drawTeamOne;
-        const drawTeamOneName = data.drawTeamOneName;
-        const drawTeamTwoId = data.drawTeamTwo;
-        const drawTeamTwoName = data.drawTeamTwoName;
+        // const drawTeamOneId = data.drawTeamOne;
+        // const drawTeamOneName = data.drawTeamOneName;
+        // const drawTeamTwoId = data.drawTeamTwo;
+        // const drawTeamTwoName = data.drawTeamTwoName;
 
         const winnerId = data.winner;
         const winnerName = data.winnerName;
 
+        const pool = data.pool;
+
         const loserId = data.loser;
         const loserName = data.loserName;
 
+        const winnerGoalPlus = parseInt(data.winnerGoalPlus) || 0
+        const winnerGoalMinus = parseInt(data.loserGoalPlus) || 0
+
+        const loserGoalPlus = parseInt(data.loserGoalPlus) || 0
+        const loserGoalMinus = parseInt(data.winnerGoalPlus) || 0
+
+        console.log(winnerGoalPlus,"winnerGoalPlus")
+
         leaderboard[ageGroup] = leaderboard[ageGroup] || {}
+
+        _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalPlus`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalPlus`, 0) + winnerGoalPlus);
+        _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalMinus`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalMinus`, 0) + winnerGoalMinus);
+
+        _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.goalMinus`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.goalMinus`, 0) + loserGoalMinus);
+        _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.goalPlus`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.goalPlus`, 0) + loserGoalPlus);
+        
+
+        _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalAverage`,
+            _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalPlus`) - _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.goalMinus`)
+        );
+        _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.goalAverage`,
+            _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.goalPlus`) - _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.goalMinus`)
+        );
+
         
         if (isMatchDraw) {
             // setting default values
-            setDefaultDrawValues(leaderboard, ageGroup, drawTeamOneId, drawTeamTwoId, drawTeamOneName, drawTeamTwoName) 
-            _.set(leaderboard, `${ageGroup}.${drawTeamOneId}.drawCount`, _.get(leaderboard, `${ageGroup}.${drawTeamOneId}.drawCount`, 0) + 1);
-            _.set(leaderboard, `${ageGroup}.${drawTeamTwoId}.drawCount`, _.get(leaderboard, `${ageGroup}.${drawTeamTwoId}.drawCount`, 0) + 1);
+            setDefaultDrawValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool) 
+            _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) + 1);
+            _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) + 1);
 
-            return // continue
+            return;
         }
 
-        setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName);
+        setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool);
 
-        _.set(leaderboard, `${ageGroup}.${winnerId}.winCount`, _.get(leaderboard, `${ageGroup}.${winnerId}.winCount`, 0) + 1);
-        _.set(leaderboard, `${ageGroup}.${loserId}.loseCount`, _.get(leaderboard, `${ageGroup}.${loserId}.loseCount`, 0) + 1);
+        _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.winCount`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.winCount`, 0) + 1);
+        _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.loseCount`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.loseCount`, 0) + 1);
     })
 
     console.log("LEADERBOARD", JSON.stringify(leaderboard));
     addPoints(leaderboard)
     sortByPoints(leaderboard);
     
-
+    console.log("LEADERBOARD1", JSON.stringify(leaderboard));
     return leaderboard;
 }
 
 function addPoints(leaderboard) {
     let ageGroups = _.keys(leaderboard)
     for (let ageGroup of ageGroups) {
-        let teams = _.keys(leaderboard[ageGroup])
-        const ageVals = []
-        for (let teamId of teams) {
-            leaderboard[ageGroup][teamId]['points'] = (_.get(leaderboard, `${ageGroup}.${teamId}.winCount`) * 5) + (_.get(leaderboard, `${ageGroup}.${teamId}.drawCount`, 0));
+        let pools = _.keys(leaderboard[ageGroup])
+        for (let pool of pools) {
+            const teams = _.keys(leaderboard[ageGroup][pool])
+            for (let teamId of teams) {
+                leaderboard[ageGroup][pool][teamId]['points'] = (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.winCount`) * 3) + (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.drawCount`, 0));
+            }
         }
     }
 }
@@ -138,13 +164,34 @@ function addPoints(leaderboard) {
 function sortByPoints(leaderboard) {
     let ageGroups = _.keys(leaderboard)
     for (let ageGroup of ageGroups) {
-        let teams = _.keys(leaderboard[ageGroup])
-        const ageVals = []
-        for (let teamId of teams) {
-            ageVals.push({ ...leaderboard[ageGroup][teamId], teamId })
+        
+        let pools = _.keys(leaderboard[ageGroup])
+        
+        for (const pool of pools) {
+            const ageVals = []
+            const teams = _.keys(leaderboard[ageGroup][pool])
+            for (let teamId of teams) {
+                ageVals.push({ ...leaderboard[ageGroup][pool][teamId], teamId, pool })
+            }
+            if (ageGroup === 'SENIOR') {
+                console.log("SENIOR:::::::::::", ageVals)
+            }
+        
+            ageVals.sort((a, b) => {
+                if (b.points === a.points) {
+                    if (b.winCount === a.winCount) {
+                        if (b.goalPlus === a.goalPlus) {
+                            return b.goalAverage - a.goalAverage;
+                        }
+                        return b.goalPlus - a.goalPlus
+                    }
+                    return b.winCount - a.winCount
+                }
+                return b.points - a.points
+            }
+            )
+            leaderboard[ageGroup][pool] = ageVals;
         }
-        ageVals.sort((a, b) => b.points - a.points)
-        leaderboard[ageGroup] = ageVals;
     }
 }
 
