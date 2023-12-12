@@ -54,10 +54,10 @@ function setDefaultDrawValues(leaderboard, ageGroup, drawTeamOneId, drawTeamTwoI
 function setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool, type='quad') {
     !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.winCount`, 0) : undefined  // setting default 0 value
     !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.loseCount`, 0) : undefined  // setting default 0 value
-    if (type === 'quad') {
-        !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) : undefined  // setting default 0 value
-        !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) : undefined  // setting default 0 value
-    }
+    //if (type === 'quad') {
+    !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) : undefined  // setting default 0 value
+    !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) : undefined  // setting default 0 value
+    //}
     !_.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.name`, winnerName) : undefined
     !_.get(leaderboard, `${ageGroup}.${pool}.${loserId}.name`) ? _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.name`, loserName) : undefined;
 
@@ -78,7 +78,7 @@ function inlineCalculation(matchList) {
         const leaderboard = {}
         _.forEach(matchList, (data) => {
             const ageGroup = data.ageGroup;
-
+            const isMatchDraw = data.isMatchDraw;
             const winnerId = data.winner;
             const winnerName = data.winnerName;
 
@@ -96,6 +96,9 @@ function inlineCalculation(matchList) {
             console.log(winnerGoalPlus, "winnerGoalPlus")
 
             leaderboard[ageGroup] = leaderboard[ageGroup] || {}
+
+            _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.matchesPlayed`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.matchesPlayed`, 0) + 1);
+            _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.matchesPlayed`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.matchesPlayed`, 0) + 1);
 
             if (data.noShow) {
                 _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.winsByNoShow`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.winsByNoShow`, 0) + 1);
@@ -123,7 +126,14 @@ function inlineCalculation(matchList) {
             );
 
 
+            if (isMatchDraw) {
+                // setting default values
+                setDefaultDrawValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool)
+                _.set(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, _.get(leaderboard, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) + 1);
+                _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) + 1);
 
+                return;
+            }
 
             setDefaultValues(leaderboard, ageGroup, winnerId, loserId, winnerName, loserName, pool, 'inline');
 
@@ -148,10 +158,12 @@ async function calculateLeaderBoard(tournamentId) {
     }
     console.log("MATCHLIST", JSON.stringify(matchList));
     const leaderboard = {}  // QUAD
+    const leaderboardMixed = {}  // QUAD MIXED
     let inlineLeaderBoard = {} //INLINE
     const groups = groupByWheelType(matchList);
     const quad = groups.quad;
     const inline = groups.inline;
+    const quadMixed = groups.quadMixed;
     /*
         AGE GROUP:{
             TEAMID:{
@@ -231,6 +243,73 @@ async function calculateLeaderBoard(tournamentId) {
             _.set(leaderboard, `${ageGroup}.${pool}.${loserId}.loseCount`, _.get(leaderboard, `${ageGroup}.${pool}.${loserId}.loseCount`, 0) + 1);
         })
     }
+    if (quadMixed) {
+        _.forEach(quadMixed, (data) => {
+            const ageGroup = data.ageGroup;
+            const isMatchDraw = data.isMatchDraw;
+
+            const winnerId = data.winner;
+            const winnerName = data.winnerName;
+
+            const pool = data.pool;
+
+            const loserId = data.loser;
+            const loserName = data.loserName;
+
+            const winnerGoalPlus = parseInt(data.winnerGoalPlus) || 0
+            const winnerGoalMinus = parseInt(data.loserGoalPlus) || 0
+
+            const loserGoalPlus = parseInt(data.loserGoalPlus) || 0
+            const loserGoalMinus = parseInt(data.winnerGoalPlus) || 0
+
+
+            leaderboardMixed[ageGroup] = leaderboardMixed[ageGroup] || {}
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.matchesPlayed`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.matchesPlayed`, 0) + 1);
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.matchesPlayed`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.matchesPlayed`, 0) + 1);
+            if (data.noShow) {
+                _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.winsByNoShow`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.winsByNoShow`, 0) + 1);
+                _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.lostByNoShow`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.lostByNoShow`, 0) + 1);
+            }
+
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalPlus`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalPlus`, 0) + winnerGoalPlus);
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalMinus`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalMinus`, 0) + winnerGoalMinus);
+
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalMinus`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalMinus`, 0) + loserGoalMinus);
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalPlus`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalPlus`, 0) + loserGoalPlus);
+
+
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalAverage`,
+                _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalPlus`) - _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalMinus`)
+            );
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalAverage`,
+                _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalPlus`) - _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalMinus`)
+            );
+
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalRatio`,
+                Math.round(_.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalPlus`) / _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.goalMinus`) * 100) / 100
+            );
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalRatio`,
+                Math.round(_.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalPlus`) / _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.goalMinus`) * 100) / 100
+            );
+
+
+
+
+            if (isMatchDraw) {
+                // setting default values
+                setDefaultDrawValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool)
+                _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) + 1);
+                _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) + 1);
+
+                return;
+            }
+
+            setDefaultValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool);
+
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.winCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.winCount`, 0) + 1);
+            _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.loseCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.loseCount`, 0) + 1);
+        })
+    }
 
     if (inline) {
         inlineLeaderBoard = inlineCalculation(inline);
@@ -240,16 +319,24 @@ async function calculateLeaderBoard(tournamentId) {
 
     console.log("LEADERBOARD", JSON.stringify(leaderboard));
     addPointsForQuad(leaderboard);
+    addPointsForQuad(leaderboardMixed); // QUAD mixed
     addPointsForInline(inlineLeaderBoard);
     sortByPoints(leaderboard);
+    sortByPoints(leaderboardMixed); //QUAD mixed
     sortByPointsInline(inlineLeaderBoard);
     
     const quadAgeGroups = _.keys(leaderboard)
+    const quadMixedAgeGroups = _.keys(leaderboardMixed) //QUAD mixed
     const inlineAgeGroups = _.keys(inlineLeaderBoard);
     const quadLeaderBoard = {}
+    const quadMixedLeaderBoard = {}
     const inlineFinalLeaderBoard = {}
     for (let qAgeGrp of quadAgeGroups) {
-        quadLeaderBoard[`${qAgeGrp} - QUAD`] = leaderboard[qAgeGrp]
+        quadLeaderBoard[`${qAgeGrp} - ROLLERHOCKEY`] = leaderboard[qAgeGrp]
+    }
+
+    for (let qMAgeGrp of quadMixedAgeGroups) {
+        quadMixedLeaderBoard[`${qMAgeGrp} - RH-MIXED`] = leaderboardMixed[qMAgeGrp]
     }
 
     for (let IAgeGrp of inlineAgeGroups) {
@@ -257,7 +344,7 @@ async function calculateLeaderBoard(tournamentId) {
     }
 
     console.log("LEADERBOARD1", JSON.stringify(leaderboard));
-    return { ...quadLeaderBoard, ...inlineFinalLeaderBoard }
+    return { ...quadLeaderBoard, ...inlineFinalLeaderBoard, ...quadMixedLeaderBoard }
 }
 
 function addPointsForQuad(leaderboard) {
@@ -284,8 +371,9 @@ function addPointsForInline(leaderboard) {
                 let shootOutWin = _.get(leaderboard, `${ageGroup}.${pool}.${teamId}.shootOutWin`, 0);
                 let shootOutLoss = _.get(leaderboard, `${ageGroup}.${pool}.${teamId}.shootOutLoss`, 0);
                 let forfiet = _.get(leaderboard, `${ageGroup}.${pool}.${teamId}.forfiet`, 0);
+                let draw = _.get(leaderboard, `${ageGroup}.${pool}.${teamId}.drawCount`, 0)
                 let forfietPointToMinus = forfiet * 3 
-                leaderboard[ageGroup][pool][teamId]['points'] = ((winCount * 3) + (shootOutWin * 2) + (shootOutLoss * 1)) - (forfietPointToMinus)
+                leaderboard[ageGroup][pool][teamId]['points'] = ((winCount * 3) + (shootOutWin * 2) + (shootOutLoss * 1) + draw) - (forfietPointToMinus)
             }
         }
     }
