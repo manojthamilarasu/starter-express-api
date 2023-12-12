@@ -297,7 +297,7 @@ async function calculateLeaderBoard(tournamentId) {
 
             if (isMatchDraw) {
                 // setting default values
-                setDefaultDrawValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool)
+                // setDefaultDrawValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool)
                 _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) + 1);
                 _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) + 1);
 
