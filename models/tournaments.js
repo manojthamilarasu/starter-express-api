@@ -35,14 +35,14 @@ async function leaderBoardCalculation(tournamentId) {
 }
 
 function setDefaultDrawValues(leaderboard, ageGroup, drawTeamOneId, drawTeamTwoId, drawTeamOneName, drawTeamTwoName, pool) {
-    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) < 0) {
-        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.winCount`, 0)
-        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.loseCount`, 0)
-    };
-    if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) < 0) {
-        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.winCount`, 0)
-        _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.loseCount`, 0)
-    };
+    // if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.drawCount`) < 0) {
+    //     _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.winCount`, 0)
+    //     _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.loseCount`, 0)
+    // };
+    // if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) || _.get(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.drawCount`) < 0) {
+    //     _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.winCount`, 0)
+    //     _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamTwoId}.loseCount`, 0)
+    // };
     if (!_.get(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.name`)) {
         _.set(leaderboard, `${ageGroup}.${pool}.${drawTeamOneId}.name`, drawTeamOneName);
     }
@@ -297,7 +297,7 @@ async function calculateLeaderBoard(tournamentId) {
 
             if (isMatchDraw) {
                 // setting default values
-                // setDefaultDrawValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool)
+                setDefaultDrawValues(leaderboardMixed, ageGroup, winnerId, loserId, winnerName, loserName, pool)
                 _.set(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${winnerId}.drawCount`, 0) + 1);
                 _.set(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, _.get(leaderboardMixed, `${ageGroup}.${pool}.${loserId}.drawCount`, 0) + 1);
 
