@@ -354,7 +354,7 @@ function addPointsForQuad(leaderboard) {
         for (let pool of pools) {
             const teams = _.keys(leaderboard[ageGroup][pool])
             for (let teamId of teams) {
-                leaderboard[ageGroup][pool][teamId]['points'] = (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.winCount`) * 3) + (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.drawCount`, 0));
+                leaderboard[ageGroup][pool][teamId]['points'] = (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.winCount`, 0) * 3) + (_.get(leaderboard, `${ageGroup}.${pool}.${teamId}.drawCount`, 0));
             }
         }
     }

@@ -1,6 +1,7 @@
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, query, where, getDoc, doc, setDoc, deleteDoc } = require('firebase/firestore')
 const { v4: uuidv4 } = require('uuid');
+const _ = require('lodash')
 
 const firebaseConfig = {
     apiKey: "AIzaSyDqT4k-JYWf_USPqIZkblHN5GL67HmR_rU",
@@ -32,6 +33,7 @@ async function addMatchResults(data) {
     try {
         const id = uuidv4()
         const teams = doc(db, "match_results", id);
+        data.createdTime = new Date().toISOString();
         data.id = id
         await setDoc(teams, data);
     } catch (err) {
@@ -114,6 +116,9 @@ async function getMatchesByTournament(tournamentId) {
         const tournamentVal = await getDocs(q);
         const tournamentList = tournamentVal.docs.map(doc => doc.data());
         if (tournamentList.length > 0) {
+            tournamentList.sort((a, b) => {
+                return new Date(_.get(b, 'createdTime', 1)) - new Date(_.get(a, 'createdTime', 0));
+            })
             return tournamentList;
         }
         return []
